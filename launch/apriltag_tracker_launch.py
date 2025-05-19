@@ -16,15 +16,9 @@ def generate_launch_description():
             output='screen'
         ),
         Node(
-            package='apriltag_detector_pkg',
-            executable='tag_tf_broadcaster',
-            name='tag_tf_broadcaster',
-            output='screen'
-        ),
-        Node(
             package='rviz2',
             executable='rviz2',
             name='rviz2',
-            arguments=['-d', '/path/to/your/apriltag_detector_pkg/rviz/apriltag_track.rviz']
+            arguments=['-d', './src/apriltag_detector_pkg/rviz/config.rviz']
         )
     ])

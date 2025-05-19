@@ -14,7 +14,7 @@ setup(
         (os.path.join('share', package_name, 'launch'), glob('launch/*.py')),
         (os.path.join('share', package_name, 'rviz'), glob('rviz/*.rviz')),
         (os.path.join('share', package_name, 'resource'), ['resource/apriltag_detector_pkg']),
-        #('share/apriltag_detector_pkg/config', ['config/apriltag_map.yaml']),
+        ('share/apriltag_detector_pkg/map', ['map/apriltag_map.yaml']),
     ],
     install_requires=['setuptools', 'pupil-apriltags', 'opencv-python'],
     zip_safe=True,
@@ -26,8 +26,6 @@ setup(
     entry_points={
         'console_scripts': [
             'image_subscriber = apriltag_detector_pkg.image_subscriber:main',
-            'dummy_pose_publisher = apriltag_detector_pkg.dummy_pose_publisher:main',
-            'tag_tf_broadcaster = apriltag_detector_pkg.tag_tf_broadcaster:main',
             'apriltag_visualizer = apriltag_detector_pkg.apriltag_visualizer:main',
         ],
     },
