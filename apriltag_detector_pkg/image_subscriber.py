@@ -9,6 +9,10 @@ from geometry_msgs.msg import PoseStamped
 from builtin_interfaces.msg import Time
 from rclpy.qos import QoSProfile
 import math
+from apriltag_detector_pkg.tag_pose_loader import load_tag_poses
+from ament_index_python.packages import get_package_share_directory
+import os
+from scipy.spatial.transform import Rotation as R
 
 class ImageSubscriber(Node):
     def __init__(self):
@@ -44,26 +48,27 @@ class ImageSubscriber(Node):
         self.cy = 360.485  # Principal point y
 
         # Tag size in meters
-        self.tag_size = 0.022
+        self.tag_size = 0.159  # Size of the AprilTag in meters
 
         self.get_logger().info("Pose publisher Initialized.")
 
+        # === Load AprilTag world poses from YAML ===
+        package_share = get_package_share_directory('apriltag_detector_pkg')
+        yaml_path = os.path.join(package_share, 'map', 'apriltag_map.yaml')
+        self.tag_poses = load_tag_poses(yaml_path)
+        self.tag_pose_dict = {tag['id']: tag for tag in self.tag_poses}
+
     def get_tag_world_pose(self, tag_id):
         """
-        Hardcoded tag poses in the world frame.
-        Returns a 4x4 transformation matrix T_tag_in_world
+        Returns a 4x4 transformation matrix T_tag_in_world from YAML.
         """
-        tag_world_poses = {
-            0: ([0.0, 0.0, 1.5], [-np.pi/2, 0.0, np.pi/2]),  # x, y, z
-            1: ([1.0, 0.0, 1.5], [0.0, np.pi/2, 0.0]),
-            # Add more as needed
-        }
-
-        if tag_id not in tag_world_poses:
+        tag = self.tag_pose_dict.get(tag_id)
+        if tag is None:
             self.get_logger().warn(f"No world pose defined for tag ID {tag_id}")
             return None
 
-        pos, rpy = tag_world_poses[tag_id]
+        pos = tag['position']
+        rpy = tag['orientation_rpy']
         rot = R.from_euler('xyz', rpy).as_matrix()
 
         T = np.eye(4)
