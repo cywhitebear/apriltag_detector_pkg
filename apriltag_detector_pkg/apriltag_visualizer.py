@@ -43,14 +43,40 @@ class AprilTagVisualizer(Node):
             marker.pose.orientation.w = quat[3]
 
             # Size
-            marker.scale.x = 0.3
-            marker.scale.y = 0.3
+            marker.scale.x = 0.16
+            marker.scale.y = 0.16
             marker.scale.z = 0.01
 
             # Color
             marker.color = ColorRGBA(r=1.0, g=1.0, b=1.0, a=1.0)
 
             self.publisher.publish(marker)
+
+            # Add text marker for tag ID 
+            text_marker = Marker()
+            text_marker.header = marker.header
+            text_marker.ns = 'apriltag_text'
+            text_marker.id = tag['id']
+            text_marker.type = Marker.TEXT_VIEW_FACING
+            text_marker.action = Marker.ADD
+
+            # Position the text slightly above the tag
+            text_marker.pose.position.x = tag['position'][0]
+            text_marker.pose.position.y = tag['position'][1]
+            text_marker.pose.position.z = tag['position'][2] + 0.1  # Adjust as needed
+
+            text_marker.pose.orientation.x = 0.0
+            text_marker.pose.orientation.y = 0.0
+            text_marker.pose.orientation.z = 0.0
+            text_marker.pose.orientation.w = 1.0
+
+            text_marker.scale.z = 0.1  # Height of the text
+
+            text_marker.color = ColorRGBA(r=1.0, g=0.0, b=0.0, a=1.0)  # Red text
+
+            text_marker.text = str(tag['id'])
+
+            self.publisher.publish(text_marker)
 
 def main(args=None):
     rclpy.init(args=args)
